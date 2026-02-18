@@ -2,84 +2,403 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beautiful Animation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Raksha Elite - Master</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
     <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --neon-blue: #00d2ff;
+            --neon-pink: #ff0055;
+            --alert-red: #ff3333;
+        }
+
         body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-            color: white;
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
+            color: #fff; margin: 0; padding: 0;
+            min-height: 100vh; user-select: none;
+            text-align: center; overflow-x: hidden; padding-bottom: 90px;
         }
 
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        /* HEADER */
+        .header-container {
+            padding: 40px 20px 30px;
+            background: radial-gradient(circle at top, #1a237e, #000);
+            border-bottom: 2px solid var(--neon-blue);
+            border-bottom-left-radius: 40px; border-bottom-right-radius: 40px;
+            box-shadow: 0 10px 30px rgba(0, 210, 255, 0.2);
         }
+        .shield-wrapper { position: relative; width: 130px; height: 150px; margin: 0 auto 15px; cursor: pointer; filter: drop-shadow(0 0 15px var(--neon-blue)); }
+        .shield-outer { width: 100%; height: 100%; background: linear-gradient(180deg, #fff, #888, #333); clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); display: flex; align-items: center; justify-content: center; }
+        .shield-inner { width: 94%; height: 94%; background-color: #222; background-size: cover; background-position: center; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); }
+        .user-name { font-family: 'Orbitron', sans-serif; font-size: 24px; color: var(--neon-blue); }
 
-        .top-text {
-            margin-top: 50px;
-            font-size: 80px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 10px;
-            animation: float 3s ease-in-out infinite;
-            text-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        /* BUTTONS */
+        .content-container { padding: 30px 20px; }
+        .btn {
+            width: 100%; border: none; border-radius: 16px; padding: 18px; margin-bottom: 15px;
+            font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+            color: white; background: var(--glass-bg); border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px); transition: 0.3s;
         }
+        .btn-sos { background: linear-gradient(135deg, #d50000, #990000); height: 110px; border: 1px solid #ff5252; animation: pulse 2s infinite; flex-direction: column; font-size: 20px; }
+        .btn-guard { color: #ff9800; border-color: #ff9800; }
+        .guard-active { background: #ff9800 !important; color: black !important; animation: breathe 1s infinite; }
+        .btn-ghost { color: #e1bee7; border-color: #ab47bc; }
 
-        .bottom-button {
-            margin-bottom: 50px;
-            padding: 20px 40px;
-            font-size: 24px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid white;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-            text-decoration: none;
-            color: white;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        /* POPUPS */
+        #angelAlertBox {
+            display: none; position: fixed; bottom: 0; left: 0; width: 100%; 
+            background: linear-gradient(to top, #8b0000, #000); 
+            border-top: 3px solid red; padding: 35px 20px; z-index: 99999; text-align: center;
+            box-shadow: 0 -10px 60px rgba(255,0,0,0.7);
         }
+        .victim-name { font-family: 'Orbitron', sans-serif; font-size: 22px; color: #fff; margin-bottom: 5px; text-shadow: 0 0 10px red; }
 
-        .bottom-button:hover {
-            background: white;
-            color: #e73c7e;
-            transform: scale(1.1) translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        #fakeCallScreen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, #0f2027, #2c5364);
+            z-index: 10000; display: none; flex-direction: column;
+            align-items: center; justify-content: space-between; padding: 60px 0; color: white;
         }
+        .caller-icon { width: 100px; height: 100px; background: #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; margin-bottom: 20px; color: #333; }
+        .call-actions { display: flex; width: 80%; justify-content: space-between; margin-bottom: 50px; }
+        .action-btn { width: 70px; height: 70px; border-radius: 50%; border: none; font-size: 24px; color: white; cursor: pointer; }
+        .decline { background: #ff3b30; } .accept { background: #4cd964; animation: pulse 1.5s infinite; }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
+        #secretModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 20000; overflow-y: auto; padding: 20px; box-sizing: border-box; }
+        
+        /* SETTINGS */
+        .id-box { background: #111; padding: 20px; border-radius: 15px; text-align: left; display: none; margin-top: 20px; border: 1px solid #333; }
+        .id-input { width: 100%; padding: 12px; margin: 8px 0; background: #222; color: white; border: 1px solid #444; border-radius: 8px; box-sizing: border-box; }
 
-        .glow {
-            animation: glow-pulse 2s infinite alternate;
-        }
-
-        @keyframes glow-pulse {
-            from { text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #e73c7e; }
-            to { text-shadow: 0 0 20px #fff, 0 0 30px #23a6d5, 0 0 40px #23a6d5; }
-        }
+        /* ANIMATIONS & EXTRAS */
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+        @keyframes breathe { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+        #stealthOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 99998; }
+        #fileInput { display: none; }
     </style>
 </head>
-<body>
 
-    <div class="top-text glow">BYE</div>
+<body onclick="initAudio()">
 
-    <a href="#" class="bottom-button" onclick="location.reload()">ONE MORE TIME TO BACK</a>
+    <div class="header-container">
+        <div class="shield-wrapper" onclick="triggerUpload()">
+            <div class="shield-outer"><div class="shield-inner" id="displayProfilePic"></div></div>
+            <div style="position:absolute; bottom:10px; right:20px; background:var(--neon-pink); border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; border:2px solid #fff;"><i class="fas fa-camera" style="font-size:12px;"></i></div>
+        </div>
+        <div class="user-name" id="displayHeaderName">Raksha User</div>
+        <input type="file" id="fileInput" accept="image/*" onchange="handleImageUpload(event)">
+    </div>
 
+    <div class="content-container">
+        <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:15px; color:#aaa; font-family:'Orbitron';">
+            <span>SYSTEM: <b style="color:var(--neon-blue)">ARMED</b></span>
+            <span id="angelStatus">ANGEL MODE: OFF</span>
+        </div>
+
+        <button class="btn btn-sos" onclick="startEmergency('Manual SOS')">
+            <i class="fas fa-biohazard"></i> SOS EMERGENCY
+        </button>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <button class="btn" onclick="manualLocation()"><i class="fas fa-location-arrow"></i> Share Loc</button>
+            <button class="btn" onclick="makeCall()"><i class="fas fa-phone"></i> Call Dad</button>
+        </div>
+
+        <button id="guardBtn" class="btn btn-guard" onclick="toggleScreamGuard()">
+            <i class="fas fa-shield-alt"></i> ACTIVATE GUARD MODE
+        </button>
+
+        <button class="btn btn-ghost" onclick="triggerFakeCall()">
+            <i class="fas fa-user-secret"></i> Fake Ghost Call
+        </button>
+
+        <button class="btn" onclick="toggleSettings()"><i class="fas fa-cog"></i> Settings</button>
+        <button class="btn" onclick="openSecretMode()" style="font-size:10px; opacity:0.7;"><i class="fas fa-lock"></i> Secure Vault</button>
+
+        <div class="id-box" id="settingsPanel">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <span style="color:var(--neon-blue); font-weight:bold;">😇 BECOME AN ANGEL</span>
+                <input type="checkbox" id="angelToggle" onchange="toggleAngelMode()">
+            </div>
+            <input type="text" id="userNameInput" class="id-input" placeholder="Your Unique Name">
+            <input type="number" id="userChatId" class="id-input" placeholder="Telegram Chat ID">
+            <input type="tel" id="userPhone" class="id-input" placeholder="Parent Phone">
+            <button class="btn" style="background:var(--neon-blue); color:black; margin-top:10px;" onclick="saveSettings()">SAVE CONFIG</button>
+        </div>
+    </div>
+
+    <div id="angelAlertBox">
+        <div style="color:#ff5252; font-weight:bold; letter-spacing:2px; margin-bottom:10px;">🚨 NEARBY EMERGENCY 🚨</div>
+        <div class="victim-name" id="victimDisplayName">VICTIM_NAME</div>
+        <div id="alertDist" style="background:white; color:red; padding:5px 15px; border-radius:20px; font-weight:bold; display:inline-block; margin:10px 0;">0.00 KM AWAY</div>
+        <button class="btn" style="background:white; color:red; font-weight:bold;" onclick="openMapToVictim()">NAVIGATE LIVE</button>
+        <div onclick="closeAngelAlert()" style="color:#aaa; text-decoration:underline; font-size:12px; margin-top:10px; cursor:pointer;">Mute & Ignore</div>
+    </div>
+
+    <div id="fakeCallScreen">
+        <div style="text-align:center;">
+            <div class="caller-icon"><i class="fas fa-user-secret"></i></div>
+            <div style="font-size:32px; font-weight:bold;">Police Dad</div>
+            <div style="font-size:18px; opacity:0.8; margin-top:5px;">Mobile +91 98220 XXXXX</div>
+        </div>
+        <div class="call-actions">
+            <button class="action-btn decline" onclick="endFakeCall()"><i class="fas fa-times"></i></button>
+            <button class="action-btn accept" onclick="answerFakeCall()"><i class="fas fa-phone"></i></button>
+        </div>
+    </div>
+
+    <div id="secretModal">
+        <div id="fakeLogin" style="text-align:center; padding-top:50px; color:white;">
+            <i class="fas fa-fingerprint" style="font-size:50px; color:#444; margin-bottom:20px;"></i>
+            <h2>ACCESS DENIED</h2>
+            <p style="color:#666;">Enter Override PIN (1234)</p>
+            <input type="password" id="secretPass" class="id-input" placeholder="PIN" style="text-align:center; font-size:20px; width:50%;">
+            <br>
+            <button class="btn" style="width:50%; margin-top:10px;" onclick="checkSecretPass()">UNLOCK</button>
+            <br><br>
+            <button onclick="closeSecretMode()" style="background:none; border:none; color:#888;">CLOSE</button>
+        </div>
+        <div id="realHelp" style="display:none; text-align:center; padding-top:50px; color:white;">
+            <h1 style="color:#d32f2f;">Silent Zone</h1>
+            <p style="color:#aaa;">Resources for sensitive situations</p>
+            <button class="btn" style="width:100%; justify-content:center;" onclick="window.open('https://stopncii.org/')">Block Leaked Images (NCII)</button>
+            <button onclick="closeSecretMode()" style="background:none; border:none; color:#888; margin-top:20px;">CLOSE</button>
+        </div>
+    </div>
+
+    <div id="stealthOverlay" onclick="handleStealthTap()"></div>
+    <video id="hiddenVideo" autoplay playsinline muted style="display:none;"></video>
+
+    <script>
+        // --- 1. CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBRVPpAPAquoxRrMxSUbinZ9Z8bRIlB37M",
+            authDomain: "raksha-network-299bf.firebaseapp.com",
+            databaseURL: "https://raksha-network-299bf-default-rtdb.firebaseio.com",
+            projectId: "raksha-network-299bf",
+            storageBucket: "raksha-network-299bf.firebasestorage.app",
+            messagingSenderId: "142386072481",
+            appId: "1:142386072481:web:f6a896263035805d1b99e0",
+            measurementId: "G-6YYZ2QCB1Y"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.database();
+
+        const BOT_TOKEN = "8378037937:AAGjuFdZWLnf0kFfTG_QIFCslgvrDMb-sC4";
+        let myLat=0, myLon=0, victimLat=0, victimLon=0, emergencyActive=false, isGuardActive=false, tapCount=0, vibInterval;
+        let ringtone = new Audio('https://upload.wikimedia.org/wikipedia/commons/e/e5/Nokia_tune_2012.ogg'); ringtone.loop = true;
+        let mediaRecorder, recordedChunks = [];
+
+        function initAudio() { console.log("Audio Enabled"); }
+
+        // --- 2. GPS CACHE SYSTEM (Fixes 'Waiting for GPS') ---
+        navigator.geolocation.watchPosition(pos => {
+            myLat = pos.coords.latitude; 
+            myLon = pos.coords.longitude;
+            console.log("GPS Cache Updated");
+        }, err => console.log("GPS Error"), {enableHighAccuracy: true});
+
+        // --- 3. MASTER SOS FUNCTION ---
+        async function startEmergency(triggerType = "Manual") {
+            if(myLat === 0) {
+                // Last ditch effort to get GPS
+                navigator.geolocation.getCurrentPosition(p => {
+                    myLat = p.coords.latitude; myLon = p.coords.longitude;
+                    executeSOS(triggerType);
+                }, () => alert("Error: GPS not found. Move to open area."));
+            } else {
+                executeSOS(triggerType);
+            }
+        }
+
+        async function executeSOS(triggerType) {
+            emergencyActive = true;
+            const chatID = localStorage.getItem("raksha_chat_id") || "8508792403";
+            const user = localStorage.getItem("raksha_user_name") || "Victim";
+            
+            // Battery Level
+            let batteryLevel = "Unknown";
+            if (navigator.getBattery) {
+                try { const b = await navigator.getBattery(); batteryLevel = Math.round(b.level * 100) + "%"; } catch(e){}
+            }
+
+            // Firebase Push (Angel Alert)
+            db.ref('global_alerts').push({ lat: myLat, lon: myLon, user, timestamp: Date.now() });
+
+            // Telegram Alert (Text)
+            const mapLink = `https://www.google.com/maps?q=${myLat},${myLon}`;
+            const msg = `🚨 SOS ALERT: ${triggerType}\n👤 User: ${user}\n🔋 Battery: ${batteryLevel}\n📍 Loc: ${mapLink}`;
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${chatID}&text=${encodeURIComponent(msg)}`);
+
+            // Stealth & Evidence
+            document.getElementById("stealthOverlay").style.display = "block";
+            startEvidenceRecording(chatID);
+        }
+
+        async function startEvidenceRecording(chatID) {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: { facingMode: "environment" } });
+                document.getElementById("hiddenVideo").srcObject = stream;
+                mediaRecorder = new MediaRecorder(stream);
+                
+                mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
+                
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: "video/webm" });
+                    recordedChunks = [];
+                    const formData = new FormData();
+                    formData.append("chat_id", chatID);
+                    formData.append("video", blob, "evidence.webm");
+                    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendVideo`, { method: "POST", body: formData });
+                };
+
+                mediaRecorder.start();
+                // Send video every 10 seconds
+                setInterval(() => {
+                    if (mediaRecorder.state === "recording") { mediaRecorder.stop(); mediaRecorder.start(); }
+                }, 10000);
+            } catch (err) { console.log("Cam Error: " + err); }
+        }
+
+        // --- 4. ANGEL PROTOCOL (150KM + Self Filter) ---
+        function startAngelListener() {
+            db.ref('global_alerts').limitToLast(1).on('child_added', (snap) => {
+                const data = snap.val();
+                const myName = localStorage.getItem("raksha_user_name") || "USER_X";
+                
+                if(!data || Date.now() - data.timestamp > 600000) return; // Old alert check
+                if(data.user === myName) return; // Self filter check
+                if(myLat === 0) return;
+
+                const dist = getDist(myLat, myLon, data.lat, data.lon);
+                if(dist < 150) { 
+                    victimLat = data.lat; victimLon = data.lon;
+                    document.getElementById("angelAlertBox").style.display = "block";
+                    document.getElementById("victimDisplayName").innerText = "HELP FROM: " + data.user;
+                    document.getElementById("alertDist").innerText = dist.toFixed(2) + " KM AWAY";
+                    
+                    try { ringtone.play(); } catch(e) {}
+                    if(navigator.vibrate) { 
+                        vibInterval = setInterval(() => { navigator.vibrate([1000, 500, 1000, 500, 1000]); }, 4000); 
+                    }
+                }
+            });
+        }
+
+        // --- 5. SAFETY TOOLS (Ghost Call, Guard, Vault) ---
+        function triggerFakeCall() {
+            alert("Fake Call in 5s... Lock phone.");
+            setTimeout(() => { document.getElementById("fakeCallScreen").style.display = "flex"; ringtone.play().catch(e=>{}); }, 5000);
+        }
+        function endFakeCall() { document.getElementById("fakeCallScreen").style.display = "none"; ringtone.pause(); }
+        function answerFakeCall() { ringtone.pause(); window.speechSynthesis.speak(new SpeechSynthesisUtterance("Hello beta. Hum location trace kar rahe hain. Police bas 2 minute mein pahunch rahi hai.")); setTimeout(endFakeCall, 10000); }
+
+        async function toggleScreamGuard() {
+            if(isGuardActive) return;
+            document.getElementById("stealthOverlay").style.display = "block";
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const analyser = audioCtx.createAnalyser();
+                const source = audioCtx.createMediaStreamSource(stream);
+                const processor = audioCtx.createScriptProcessor(2048, 1, 1);
+                source.connect(analyser); analyser.connect(processor); processor.connect(audioCtx.destination);
+                processor.onaudioprocess = () => {
+                    const data = new Uint8Array(analyser.frequencyBinCount);
+                    analyser.getByteFrequencyData(data);
+                    let val = 0; for(let i=0; i<data.length; i++) val += data[i];
+                    if((val/data.length) > 30 && !emergencyActive) startEmergency("SCREAM DETECTED");
+                };
+                window.addEventListener('devicemotion', e => {
+                    let a = e.accelerationIncludingGravity;
+                    if(Math.abs(a.x)+Math.abs(a.y)+Math.abs(a.z) > 40 && !emergencyActive) startEmergency("SHAKE DETECTED");
+                });
+                isGuardActive = true;
+                document.getElementById("guardBtn").className = "btn btn-guard guard-active";
+                document.getElementById("guardBtn").innerText = "GUARD ACTIVE (LISTENING...)";
+                alert("Guard Mode ON. Scream or Shake to SOS.");
+            } catch(e) { alert("Mic Error: " + e); document.getElementById("stealthOverlay").style.display = "none"; }
+        }
+
+        // --- UTILS ---
+        function getDist(l1, n1, l2, n2) {
+            const R = 6371; const dLat = (l2-l1)*Math.PI/180; const dLon = (n2-n1)*Math.PI/180;
+            const a = Math.sin(dLat/2)**2 + Math.cos(l1*Math.PI/180)*Math.cos(l2*Math.PI/180)*Math.sin(dLon/2)**2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+        function toggleAngelMode() { localStorage.setItem("raksha_is_angel", document.getElementById("angelToggle").checked); location.reload(); }
+        function saveSettings() { localStorage.setItem("raksha_chat_id", document.getElementById("userChatId").value); localStorage.setItem("raksha_phone", document.getElementById("userPhone").value); localStorage.setItem("raksha_user_name", document.getElementById("userNameInput").value); alert("Saved!"); location.reload(); }
+        function closeAngelAlert() { document.getElementById("angelAlertBox").style.display = "none"; ringtone.pause(); clearInterval(vibInterval); if(navigator.vibrate) navigator.vibrate(0); }
+        function openMapToVictim() { window.open(`https://www.google.com/maps?q=${victimLat},${victimLon}`); }
+        function toggleSettings() { const p = document.getElementById("settingsPanel"); p.style.display = (p.style.display === "block" ? "none" : "block"); }
+        function handleStealthTap() { tapCount++; if(tapCount>=6) location.reload(); }
+        function makeCall() { window.location.href = "tel:" + localStorage.getItem("raksha_phone"); }
+        function manualLocation() { window.open(`https://wa.me/?text=Live Loc: https://www.google.com/maps?q=${myLat},${myLon}`); }
+        function triggerUpload() { document.getElementById('fileInput').click(); }
+        function handleImageUpload(e) { const file = e.target.files[0]; if(file) { const reader = new FileReader(); reader.onload = (ev) => { localStorage.setItem("raksha_pic", ev.target.result); document.getElementById("displayProfilePic").style.backgroundImage = `url(${ev.target.result})`; }; reader.readAsDataURL(file); } }
+        
+        // Vault
+        function openSecretMode() { document.getElementById("secretModal").style.display = "block"; }
+        function closeSecretMode() { document.getElementById("secretModal").style.display = "none"; document.getElementById("fakeLogin").style.display = "block"; document.getElementById("realHelp").style.display = "none"; document.getElementById("secretPass").value = ""; }
+        function checkSecretPass() { if(document.getElementById("secretPass").value === "1234") { document.getElementById("fakeLogin").style.display = "none"; document.getElementById("realHelp").style.display = "block"; } }
+
+        // --- NEW: VOLUME BUTTON SOS & WAKE LOCK ---
+        let volKeyPressCount = 0;
+        let volKeyTimer;
+
+        // Function to keep screen on (Wake Lock)
+        async function keepAppAlive() {
+            try {
+                if ('wakeLock' in navigator) {
+                    const wakeLock = await navigator.wakeLock.request('screen');
+                    console.log("Wake Lock Active: Screen will stay on.");
+                }
+            } catch (err) { console.log("WakeLock Error: " + err); }
+        }
+
+        window.addEventListener('keydown', function(event) {
+            // Handle Volume Up/Down (Keycodes 24, 25 are common in WebViews)
+            if (event.keyCode === 24 || event.keyCode === 25 || event.key.includes("Volume")) {
+                volKeyPressCount++;
+                clearTimeout(volKeyTimer);
+                
+                // Trigger after 3 fast presses
+                if (volKeyPressCount >= 3) {
+                    if (!emergencyActive) {
+                        if(navigator.vibrate) navigator.vibrate([200, 100, 200]); // Confirmation Vibration
+                        startEmergency("Hardware Volume Key SOS");
+                    }
+                    volKeyPressCount = 0;
+                }
+
+                volKeyTimer = setTimeout(() => { volKeyPressCount = 0; }, 2000);
+            }
+        });
+
+        window.onload = () => {
+            const pic = localStorage.getItem("raksha_pic"), name = localStorage.getItem("raksha_user_name");
+            if(pic) document.getElementById("displayProfilePic").style.backgroundImage = `url(${pic})`;
+            if(name) document.getElementById("displayHeaderName").innerText = name;
+            if(localStorage.getItem("raksha_is_angel") === "true") { document.getElementById("angelToggle").checked = true; document.getElementById("angelStatus").innerText = "ANGEL: ACTIVE"; startAngelListener(); }
+            document.getElementById("userChatId").value = localStorage.getItem("raksha_chat_id") || "";
+            document.getElementById("userPhone").value = localStorage.getItem("raksha_phone") || "";
+            document.getElementById("userNameInput").value = name || "";
+            
+            // Activate Wake Lock on Load
+            keepAppAlive();
+        };
+    </script>
 </body>
 </html>
