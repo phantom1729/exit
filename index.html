@@ -1,404 +1,361 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Raksha Elite - Master</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vardhan Garlic's™️ | Premium Quality Garlic</title>
+    <!-- Tailwind CSS for rapid modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Playfair Display for luxury, Inter for clean reading -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: '#D4AF37',
+                        darkGreen: '#0f3d20',
+                        premiumBlack: '#0a0a0a',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --bg-gradient: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --neon-blue: #00d2ff;
-            --neon-pink: #ff0055;
-            --alert-red: #ff3333;
+        /* Glassmorphism for transparent product cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
         }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: var(--bg-gradient);
-            color: #fff; margin: 0; padding: 0;
-            min-height: 100vh; user-select: none;
-            text-align: center; overflow-x: hidden; padding-bottom: 90px;
-        }
-
-        /* HEADER */
-        .header-container {
-            padding: 40px 20px 30px;
-            background: radial-gradient(circle at top, #1a237e, #000);
-            border-bottom: 2px solid var(--neon-blue);
-            border-bottom-left-radius: 40px; border-bottom-right-radius: 40px;
-            box-shadow: 0 10px 30px rgba(0, 210, 255, 0.2);
-        }
-        .shield-wrapper { position: relative; width: 130px; height: 150px; margin: 0 auto 15px; cursor: pointer; filter: drop-shadow(0 0 15px var(--neon-blue)); }
-        .shield-outer { width: 100%; height: 100%; background: linear-gradient(180deg, #fff, #888, #333); clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); display: flex; align-items: center; justify-content: center; }
-        .shield-inner { width: 94%; height: 94%; background-color: #222; background-size: cover; background-position: center; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); }
-        .user-name { font-family: 'Orbitron', sans-serif; font-size: 24px; color: var(--neon-blue); }
-
-        /* BUTTONS */
-        .content-container { padding: 30px 20px; }
-        .btn {
-            width: 100%; border: none; border-radius: 16px; padding: 18px; margin-bottom: 15px;
-            font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px;
-            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
-            color: white; background: var(--glass-bg); border: 1px solid var(--glass-border);
-            backdrop-filter: blur(10px); transition: 0.3s;
-        }
-        .btn-sos { background: linear-gradient(135deg, #d50000, #990000); height: 110px; border: 1px solid #ff5252; animation: pulse 2s infinite; flex-direction: column; font-size: 20px; }
-        .btn-guard { color: #ff9800; border-color: #ff9800; }
-        .guard-active { background: #ff9800 !important; color: black !important; animation: breathe 1s infinite; }
-        .btn-ghost { color: #e1bee7; border-color: #ab47bc; }
-
-        /* POPUPS */
-        #angelAlertBox {
-            display: none; position: fixed; bottom: 0; left: 0; width: 100%; 
-            background: linear-gradient(to top, #8b0000, #000); 
-            border-top: 3px solid red; padding: 35px 20px; z-index: 99999; text-align: center;
-            box-shadow: 0 -10px 60px rgba(255,0,0,0.7);
-        }
-        .victim-name { font-family: 'Orbitron', sans-serif; font-size: 22px; color: #fff; margin-bottom: 5px; text-shadow: 0 0 10px red; }
-
-        #fakeCallScreen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, #0f2027, #2c5364);
-            z-index: 10000; display: none; flex-direction: column;
-            align-items: center; justify-content: space-between; padding: 60px 0; color: white;
-        }
-        .caller-icon { width: 100px; height: 100px; background: #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; margin-bottom: 20px; color: #333; }
-        .call-actions { display: flex; width: 80%; justify-content: space-between; margin-bottom: 50px; }
-        .action-btn { width: 70px; height: 70px; border-radius: 50%; border: none; font-size: 24px; color: white; cursor: pointer; }
-        .decline { background: #ff3b30; } .accept { background: #4cd964; animation: pulse 1.5s infinite; }
-
-        #secretModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 20000; overflow-y: auto; padding: 20px; box-sizing: border-box; }
-        
-        /* SETTINGS */
-        .id-box { background: #111; padding: 20px; border-radius: 15px; text-align: left; display: none; margin-top: 20px; border: 1px solid #333; }
-        .id-input { width: 100%; padding: 12px; margin: 8px 0; background: #222; color: white; border: 1px solid #444; border-radius: 8px; box-sizing: border-box; }
-
-        /* ANIMATIONS & EXTRAS */
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
-        @keyframes breathe { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
-        #stealthOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 99998; }
-        #fileInput { display: none; }
+        /* Smooth fade-in animation class */
+        .fade-in { animation: fadeIn 1.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
+<body class="bg-premiumBlack text-white font-sans antialiased">
 
-<body onclick="initAudio()">
-
-    <div class="header-container">
-        <div class="shield-wrapper" onclick="triggerUpload()">
-            <div class="shield-outer"><div class="shield-inner" id="displayProfilePic"></div></div>
-            <div style="position:absolute; bottom:10px; right:20px; background:var(--neon-pink); border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; border:2px solid #fff;"><i class="fas fa-camera" style="font-size:12px;"></i></div>
+    <!-- Header / Navbar -->
+    <header class="fixed w-full top-0 z-50 bg-premiumBlack bg-opacity-90 backdrop-blur-md border-b border-gold/20">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-serif font-bold text-gold flex items-center gap-2">
+                <!-- LOGO PLACEHOLDER -->
+                <i class="fa-solid fa-seedling text-white"></i> Vardhan Garlic's™️
+            </a>
+            <nav class="hidden md:flex space-x-8 text-sm font-semibold text-gray-300">
+                <a href="#about" class="hover:text-gold transition">About</a>
+                <a href="#products" class="hover:text-gold transition">Products</a>
+                <a href="#pricing" class="hover:text-gold transition">Pricing</a>
+                <a href="#contact" class="hover:text-gold transition">Contact</a>
+            </nav>
+            <a href="#contact" class="bg-gold text-premiumBlack px-5 py-2 rounded-full font-bold hover:bg-white transition duration-300">
+                Order Now
+            </a>
         </div>
-        <div class="user-name" id="displayHeaderName">Raksha User</div>
-        <input type="file" id="fileInput" accept="image/*" onchange="handleImageUpload(event)">
-    </div>
+    </header>
 
-    <div class="content-container">
-        <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:15px; color:#aaa; font-family:'Orbitron';">
-            <span>SYSTEM: <b style="color:var(--neon-blue)">ARMED</b></span>
-            <span id="angelStatus">ANGEL MODE: OFF</span>
-        </div>
-
-        <button class="btn btn-sos" onclick="startEmergency('Manual SOS')">
-            <i class="fas fa-biohazard"></i> SOS EMERGENCY
-        </button>
-
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <button class="btn" onclick="manualLocation()"><i class="fas fa-location-arrow"></i> Share Loc</button>
-            <button class="btn" onclick="makeCall()"><i class="fas fa-phone"></i> Call Dad</button>
-        </div>
-
-        <button id="guardBtn" class="btn btn-guard" onclick="toggleScreamGuard()">
-            <i class="fas fa-shield-alt"></i> ACTIVATE GUARD MODE
-        </button>
-
-        <button class="btn btn-ghost" onclick="triggerFakeCall()">
-            <i class="fas fa-user-secret"></i> Fake Ghost Call
-        </button>
-
-        <button class="btn" onclick="toggleSettings()"><i class="fas fa-cog"></i> Settings</button>
-        <button class="btn" onclick="openSecretMode()" style="font-size:10px; opacity:0.7;"><i class="fas fa-lock"></i> Secure Vault</button>
-
-        <div class="id-box" id="settingsPanel">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <span style="color:var(--neon-blue); font-weight:bold;">😇 BECOME AN ANGEL</span>
-                <input type="checkbox" id="angelToggle" onchange="toggleAngelMode()">
+    <!-- 1. Hero Section -->
+    <section class="relative h-screen flex items-center justify-center text-center fade-in pt-20" style="background: linear-gradient(rgba(10,10,10,0.8), rgba(15,61,32,0.8)), url('https://images.unsplash.com/photo-1540432797114-187e1284b160?q=80&w=2000&auto=format&fit=crop') center/cover;">
+        <div class="container mx-auto px-6">
+            <h1 class="text-5xl md:text-7xl font-serif font-bold text-white mb-4">
+                Freshness You Can <span class="text-gold">See</span>,<br>Quality You Can <span class="text-gold">Trust.</span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                Premium peeled garlic and authentic garlic-based products. Sourced fresh, packed hygienically, and delivered fast.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#contact" class="bg-gold text-premiumBlack px-8 py-4 rounded-full font-bold text-lg hover:bg-white transition duration-300 shadow-[0_0_15px_rgba(212,175,55,0.4)]">
+                    Order Now
+                </a>
+                <a href="#supply" class="border border-gold text-gold px-8 py-4 rounded-full font-bold text-lg hover:bg-gold hover:text-premiumBlack transition duration-300">
+                    Bulk Supply Available
+                </a>
             </div>
-            <input type="text" id="userNameInput" class="id-input" placeholder="Your Unique Name">
-            <input type="number" id="userChatId" class="id-input" placeholder="Telegram Chat ID">
-            <input type="tel" id="userPhone" class="id-input" placeholder="Parent Phone">
-            <button class="btn" style="background:var(--neon-blue); color:black; margin-top:10px;" onclick="saveSettings()">SAVE CONFIG</button>
         </div>
-    </div>
+    </section>
 
-    <div id="angelAlertBox">
-        <div style="color:#ff5252; font-weight:bold; letter-spacing:2px; margin-bottom:10px;">🚨 NEARBY EMERGENCY 🚨</div>
-        <div class="victim-name" id="victimDisplayName">VICTIM_NAME</div>
-        <div id="alertDist" style="background:white; color:red; padding:5px 15px; border-radius:20px; font-weight:bold; display:inline-block; margin:10px 0;">0.00 KM AWAY</div>
-        <button class="btn" style="background:white; color:red; font-weight:bold;" onclick="openMapToVictim()">NAVIGATE LIVE</button>
-        <div onclick="closeAngelAlert()" style="color:#aaa; text-decoration:underline; font-size:12px; margin-top:10px; cursor:pointer;">Mute & Ignore</div>
-    </div>
-
-    <div id="fakeCallScreen">
-        <div style="text-align:center;">
-            <div class="caller-icon"><i class="fas fa-user-secret"></i></div>
-            <div style="font-size:32px; font-weight:bold;">Police Dad</div>
-            <div style="font-size:18px; opacity:0.8; margin-top:5px;">Mobile +91 98220 XXXXX</div>
+    <!-- 2. About Brand -->
+    <section id="about" class="py-20 bg-white text-premiumBlack">
+        <div class="container mx-auto px-6 text-center max-w-4xl">
+            <h2 class="text-4xl font-serif font-bold mb-6">The Story of <span class="text-darkGreen">Vardhan Garlic's™️</span></h2>
+            <div class="w-24 h-1 bg-gold mx-auto mb-8"></div>
+            <p class="text-lg text-gray-700 leading-relaxed mb-6">
+                Born out of a dream to bring the purest, most pungent flavors to every kitchen, Vardhan Garlic's™️ stands for uncompromising quality. We understand that great food starts with great ingredients.
+            </p>
+            <p class="text-lg text-gray-700 leading-relaxed">
+                Our focus is completely on <strong>100% hygiene</strong> and <strong>farm-freshness</strong>. From perfectly peeled cloves to rich, aromatic oils, every product is processed in state-of-the-art facilities to ensure you get nothing but the best.
+            </p>
         </div>
-        <div class="call-actions">
-            <button class="action-btn decline" onclick="endFakeCall()"><i class="fas fa-times"></i></button>
-            <button class="action-btn accept" onclick="answerFakeCall()"><i class="fas fa-phone"></i></button>
-        </div>
-    </div>
+    </section>
 
-    <div id="secretModal">
-        <div id="fakeLogin" style="text-align:center; padding-top:50px; color:white;">
-            <i class="fas fa-fingerprint" style="font-size:50px; color:#444; margin-bottom:20px;"></i>
-            <h2>ACCESS DENIED</h2>
-            <p style="color:#666;">Enter Override PIN (1234)</p>
-            <input type="password" id="secretPass" class="id-input" placeholder="PIN" style="text-align:center; font-size:20px; width:50%;">
-            <br>
-            <button class="btn" style="width:50%; margin-top:10px;" onclick="checkSecretPass()">UNLOCK</button>
-            <br><br>
-            <button onclick="closeSecretMode()" style="background:none; border:none; color:#888;">CLOSE</button>
-        </div>
-        <div id="realHelp" style="display:none; text-align:center; padding-top:50px; color:white;">
-            <h1 style="color:#d32f2f;">Silent Zone</h1>
-            <p style="color:#aaa;">Resources for sensitive situations</p>
-            <button class="btn" style="width:100%; justify-content:center;" onclick="window.open('https://stopncii.org/')">Block Leaked Images (NCII)</button>
-            <button onclick="closeSecretMode()" style="background:none; border:none; color:#888; margin-top:20px;">CLOSE</button>
-        </div>
-    </div>
-
-    <div id="stealthOverlay" onclick="handleStealthTap()"></div>
-    <video id="hiddenVideo" autoplay playsinline muted style="display:none;"></video>
-
-    <script>
-        // --- 1. CONFIGURATION ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyBRVPpAPAquoxRrMxSUbinZ9Z8bRIlB37M",
-            authDomain: "raksha-network-299bf.firebaseapp.com",
-            databaseURL: "https://raksha-network-299bf-default-rtdb.firebaseio.com",
-            projectId: "raksha-network-299bf",
-            storageBucket: "raksha-network-299bf.firebasestorage.app",
-            messagingSenderId: "142386072481",
-            appId: "1:142386072481:web:f6a896263035805d1b99e0",
-            measurementId: "G-6YYZ2QCB1Y"
-        };
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const db = firebase.database();
-
-        const BOT_TOKEN = "8378037937:AAGjuFdZWLnf0kFfTG_QIFCslgvrDMb-sC4";
-        let myLat=0, myLon=0, victimLat=0, victimLon=0, emergencyActive=false, isGuardActive=false, tapCount=0, vibInterval;
-        let ringtone = new Audio('https://upload.wikimedia.org/wikipedia/commons/e/e5/Nokia_tune_2012.ogg'); ringtone.loop = true;
-        let mediaRecorder, recordedChunks = [];
-
-        function initAudio() { console.log("Audio Enabled"); }
-
-        // --- 2. GPS CACHE SYSTEM (Fixes 'Waiting for GPS') ---
-        navigator.geolocation.watchPosition(pos => {
-            myLat = pos.coords.latitude; 
-            myLon = pos.coords.longitude;
-            console.log("GPS Cache Updated");
-        }, err => console.log("GPS Error"), {enableHighAccuracy: true});
-
-        // --- 3. MASTER SOS FUNCTION ---
-        async function startEmergency(triggerType = "Manual") {
-            if(myLat === 0) {
-                // Last ditch effort to get GPS
-                navigator.geolocation.getCurrentPosition(p => {
-                    myLat = p.coords.latitude; myLon = p.coords.longitude;
-                    executeSOS(triggerType);
-                }, () => alert("Error: GPS not found. Move to open area."));
-            } else {
-                executeSOS(triggerType);
-            }
-        }
-
-        async function executeSOS(triggerType) {
-            emergencyActive = true;
-            const chatID = localStorage.getItem("raksha_chat_id") || "8508792403";
-            const user = localStorage.getItem("raksha_user_name") || "Victim";
+    <!-- 3. Products Section -->
+    <section id="products" class="py-20 bg-darkGreen relative">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-serif font-bold text-white text-center mb-12">Our Premium <span class="text-gold">Products</span></h2>
             
-            // Battery Level
-            let batteryLevel = "Unknown";
-            if (navigator.getBattery) {
-                try { const b = await navigator.getBattery(); batteryLevel = Math.round(b.level * 100) + "%"; } catch(e){}
-            }
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Product 1 -->
+                <div class="glass-card rounded-2xl p-6 text-center hover:scale-105 transition-all duration-300">
+                    <div class="h-48 bg-gray-800 rounded-xl mb-4 flex items-center justify-center overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1540432797114-187e1284b160?w=500&auto=format&fit=crop" alt="Peeled Garlic" class="w-full h-full object-cover opacity-80 hover:opacity-100 transition">
+                    </div>
+                    <h3 class="text-2xl font-serif text-gold mb-2">Peeled Garlic</h3>
+                    <p class="text-gray-300 text-sm mb-4">Ready to use, zero hassle, 100% hygienic.</p>
+                </div>
+                <!-- Product 2 -->
+                <div class="glass-card rounded-2xl p-6 text-center hover:scale-105 transition-all duration-300">
+                    <div class="h-48 bg-gray-800 rounded-xl mb-4 flex items-center justify-center overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1596660634626-4d058bd0d473?w=500&auto=format&fit=crop" alt="Garlic Paste" class="w-full h-full object-cover opacity-80 hover:opacity-100 transition">
+                    </div>
+                    <h3 class="text-2xl font-serif text-gold mb-2">Garlic Paste</h3>
+                    <p class="text-gray-300 text-sm mb-4">Smooth, rich, and naturally preserved aroma.</p>
+                </div>
+                <!-- Product 3 -->
+                <div class="glass-card rounded-2xl p-6 text-center hover:scale-105 transition-all duration-300">
+                    <div class="h-48 bg-gray-800 rounded-xl mb-4 flex items-center justify-center overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1615485925600-97237c4fc1ec?w=500&auto=format&fit=crop" alt="Ginger Garlic Paste" class="w-full h-full object-cover opacity-80 hover:opacity-100 transition">
+                    </div>
+                    <h3 class="text-2xl font-serif text-gold mb-2">Ginger Garlic Paste</h3>
+                    <p class="text-gray-300 text-sm mb-4">The perfect balanced blend for Indian curries.</p>
+                </div>
+                <!-- Product 4 -->
+                <div class="glass-card rounded-2xl p-6 text-center hover:scale-105 transition-all duration-300">
+                    <div class="h-48 bg-gray-800 rounded-xl mb-4"></div>
+                    <h3 class="text-2xl font-serif text-gold mb-2">Garlic Powder</h3>
+                    <p class="text-gray-300 text-sm mb-4">Fine texture, intense flavor for seasoning.</p>
+                </div>
+                <!-- Product 5 -->
+                <div class="glass-card rounded-2xl p-6 text-center hover:scale-105 transition-all duration-300">
+                    <div class="h-48 bg-gray-800 rounded-xl mb-4"></div>
+                    <h3 class="text-2xl font-serif text-gold mb-2">Fried Garlic</h3>
+                    <p class="text-gray-300 text-sm mb-4">Crispy, golden garnish for soups and stir-fries.</p>
+                </div>
+                <!-- Product 6 -->
+                <div class="glass-card rounded-2xl p-6 text-center hover:scale-105 transition-all duration-300">
+                    <div class="h-48 bg-gray-800 rounded-xl mb-4"></div>
+                    <h3 class="text-2xl font-serif text-gold mb-2">Garlic Oil</h3>
+                    <p class="text-gray-300 text-sm mb-4">Cold-pressed perfection for drizzling and cooking.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-            // Firebase Push (Angel Alert)
-            db.ref('global_alerts').push({ lat: myLat, lon: myLon, user, timestamp: Date.now() });
-
-            // Telegram Alert (Text)
-            const mapLink = `https://www.google.com/maps?q=${myLat},${myLon}`;
-            const msg = `🚨 SOS ALERT: ${triggerType}\n👤 User: ${user}\n🔋 Battery: ${batteryLevel}\n📍 Loc: ${mapLink}`;
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${chatID}&text=${encodeURIComponent(msg)}`);
-
-            // Stealth & Evidence
-            document.getElementById("stealthOverlay").style.display = "block";
-            startEvidenceRecording(chatID);
-        }
-
-        async function startEvidenceRecording(chatID) {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: { facingMode: "environment" } });
-                document.getElementById("hiddenVideo").srcObject = stream;
-                mediaRecorder = new MediaRecorder(stream);
+    <!-- 4. Price List & 6. Restaurant Supply Combined -->
+    <section id="pricing" class="py-20 bg-premiumBlack">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col lg:flex-row gap-12 items-center">
+                <!-- Supply Info -->
+                <div id="supply" class="lg:w-1/2">
+                    <h2 class="text-4xl font-serif font-bold text-white mb-6">Restaurant & <span class="text-gold">Bulk Supply</span></h2>
+                    <p class="text-gray-400 mb-8">We partner with top restaurants and caterers to provide uninterrupted, high-quality supplies.</p>
+                    <ul class="space-y-6">
+                        <li class="flex items-center gap-4 text-lg"><i class="fa-solid fa-truck-fast text-gold text-2xl w-8"></i> Fast & Reliable Delivery</li>
+                        <li class="flex items-center gap-4 text-lg"><i class="fa-solid fa-hands-bubbles text-gold text-2xl w-8"></i> 100% Hygienic Packing</li>
+                        <li class="flex items-center gap-4 text-lg"><i class="fa-solid fa-boxes-stacked text-gold text-2xl w-8"></i> Wholesale Bulk Orders</li>
+                        <li class="flex items-center gap-4 text-lg"><i class="fa-solid fa-calendar-check text-gold text-2xl w-8"></i> Daily Fresh Supply Guarantee</li>
+                    </ul>
+                </div>
                 
-                mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
+                <!-- Pricing Cards -->
+                <div class="lg:w-1/2 flex flex-col sm:flex-row gap-6 w-full">
+                    <!-- Retail -->
+                    <div class="bg-white text-premiumBlack rounded-2xl p-8 flex-1 border-t-4 border-darkGreen shadow-lg">
+                        <h3 class="text-2xl font-bold mb-2">Retail</h3>
+                        <p class="text-gray-500 mb-6">For home chefs & daily use.</p>
+                        <div class="text-4xl font-serif font-bold text-darkGreen mb-6">Standard<span class="text-sm text-gray-500 font-sans">/MRP</span></div>
+                        <ul class="space-y-3 mb-8 text-sm font-semibold">
+                            <li>✓ Standard Packaging</li>
+                            <li>✓ Minimum Order: 1kg</li>
+                            <li>✓ Doorstep Delivery</li>
+                        </ul>
+                        <a href="#contact" class="block w-full text-center border-2 border-darkGreen text-darkGreen py-3 rounded-full font-bold hover:bg-darkGreen hover:text-white transition">Get Price List</a>
+                    </div>
+                    <!-- Bulk/B2B -->
+                    <div class="bg-darkGreen text-white rounded-2xl p-8 flex-1 border-t-4 border-gold shadow-lg transform sm:-translate-y-4">
+                        <div class="bg-gold text-premiumBlack text-xs font-bold inline-block px-3 py-1 rounded-full mb-4">MOST POPULAR</div>
+                        <h3 class="text-2xl font-bold mb-2 text-gold">Restaurant Bulk</h3>
+                        <p class="text-gray-300 mb-6">For commercial kitchens.</p>
+                        <div class="text-4xl font-serif font-bold text-white mb-6">Wholesale<span class="text-sm text-gray-400 font-sans">/Rates</span></div>
+                        <ul class="space-y-3 mb-8 text-sm font-semibold">
+                            <li>✓ Commercial Food-Grade Packing</li>
+                            <li>✓ Heavy Discounts</li>
+                            <li>✓ Priority Daily Routing</li>
+                        </ul>
+                        <a href="#contact" class="block w-full text-center bg-gold text-premiumBlack py-3 rounded-full font-bold hover:bg-white transition shadow-[0_0_10px_rgba(212,175,55,0.5)]">Request Bulk Quote</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Customer Reviews -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-serif font-bold text-premiumBlack text-center mb-12">What Our <span class="text-darkGreen">Clients Say</span></h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-gray-50 p-8 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="text-gold mb-4"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+                    <p class="text-gray-600 italic mb-6">"The peeled garlic saves my restaurant prep team hours every day. The freshness is unmatched. Highly recommended!"</p>
+                    <div class="font-bold text-premiumBlack">- Chef Rahul, City Diner</div>
+                </div>
+                <div class="bg-gray-50 p-8 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="text-gold mb-4"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+                    <p class="text-gray-600 italic mb-6">"Vardhan Garlic's Ginger Garlic paste tastes just like homemade. I use it for all my catering orders now."</p>
+                    <div class="font-bold text-premiumBlack">- Priya S., Event Caterer</div>
+                </div>
+                <div class="bg-gray-50 p-8 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="text-gold mb-4"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+                    <p class="text-gray-600 italic mb-6">"Always delivered on time and the packaging is highly hygienic. True professionals in the food supply business."</p>
+                    <div class="font-bold text-premiumBlack">- Aman K., Hotel Manager</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. Contact & Order Form -->
+    <section id="contact" class="py-20 bg-premiumBlack relative">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col lg:flex-row gap-12 bg-darkGreen rounded-3xl overflow-hidden shadow-2xl">
                 
-                mediaRecorder.onstop = () => {
-                    const blob = new Blob(recordedChunks, { type: "video/webm" });
-                    recordedChunks = [];
-                    const formData = new FormData();
-                    formData.append("chat_id", chatID);
-                    formData.append("video", blob, "evidence.webm");
-                    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendVideo`, { method: "POST", body: formData });
-                };
-
-                mediaRecorder.start();
-                // Send video every 10 seconds
-                setInterval(() => {
-                    if (mediaRecorder.state === "recording") { mediaRecorder.stop(); mediaRecorder.start(); }
-                }, 10000);
-            } catch (err) { console.log("Cam Error: " + err); }
-        }
-
-        // --- 4. ANGEL PROTOCOL (150KM + Self Filter) ---
-        function startAngelListener() {
-            db.ref('global_alerts').limitToLast(1).on('child_added', (snap) => {
-                const data = snap.val();
-                const myName = localStorage.getItem("raksha_user_name") || "USER_X";
-                
-                if(!data || Date.now() - data.timestamp > 600000) return; // Old alert check
-                if(data.user === myName) return; // Self filter check
-                if(myLat === 0) return;
-
-                const dist = getDist(myLat, myLon, data.lat, data.lon);
-                if(dist < 150) { 
-                    victimLat = data.lat; victimLon = data.lon;
-                    document.getElementById("angelAlertBox").style.display = "block";
-                    document.getElementById("victimDisplayName").innerText = "HELP FROM: " + data.user;
-                    document.getElementById("alertDist").innerText = dist.toFixed(2) + " KM AWAY";
+                <!-- Contact Info & Map -->
+                <div class="lg:w-2/5 p-10 bg-black/40 flex flex-col justify-between">
+                    <div>
+                        <h2 class="text-3xl font-serif font-bold text-gold mb-6">Get in Touch</h2>
+                        <p class="text-gray-300 mb-8">Ready to order or need a custom bulk quote? Fill out the form or reach us directly.</p>
+                        
+                        <div class="space-y-6">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-gold/10 text-gold rounded-full flex items-center justify-center text-xl"><i class="fa-brands fa-whatsapp"></i></div>
+                                <div>
+                                    <p class="text-sm text-gray-400">WhatsApp / Call</p>
+                                    <p class="font-bold text-lg">+91 7061051661</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-gold/10 text-gold rounded-full flex items-center justify-center text-xl"><i class="fa-brands fa-instagram"></i></div>
+                                <div>
+                                    <p class="text-sm text-gray-400">Instagram</p>
+                                    <a href="https://instagram.com/vardhan.garlics" target="_blank" class="font-bold text-lg hover:text-gold transition">@vardhan.garlics</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     
-                    try { ringtone.play(); } catch(e) {}
-                    if(navigator.vibrate) { 
-                        vibInterval = setInterval(() => { navigator.vibrate([1000, 500, 1000, 500, 1000]); }, 4000); 
-                    }
-                }
-            });
-        }
+                    <!-- Map Placeholder -->
+                    <div class="mt-10 h-48 bg-gray-700 rounded-xl overflow-hidden relative">
+                        <div class="absolute inset-0 flex items-center justify-center text-gray-400 flex-col bg-black/60 z-10">
+                            <i class="fa-solid fa-map-location-dot text-3xl mb-2"></i>
+                            <span>Google Maps Location</span>
+                        </div>
+                        <!-- Replace src with actual google maps embed iframe link -->
+                        <iframe class="w-full h-full opacity-50" src="https://www.google.com/maps/embed?pb=" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                    </div>
+                </div>
 
-        // --- 5. SAFETY TOOLS (Ghost Call, Guard, Vault) ---
-        function triggerFakeCall() {
-            alert("Fake Call in 5s... Lock phone.");
-            setTimeout(() => { document.getElementById("fakeCallScreen").style.display = "flex"; ringtone.play().catch(e=>{}); }, 5000);
-        }
-        function endFakeCall() { document.getElementById("fakeCallScreen").style.display = "none"; ringtone.pause(); }
-        function answerFakeCall() { ringtone.pause(); window.speechSynthesis.speak(new SpeechSynthesisUtterance("Hello beta. Hum location trace kar rahe hain. Police bas 2 minute mein pahunch rahi hai.")); setTimeout(endFakeCall, 10000); }
+                <!-- Order Form (Connects to WhatsApp) -->
+                <div class="lg:w-3/5 p-10">
+                    <h3 class="text-2xl font-bold text-white mb-6">Place an Order / Inquiry</h3>
+                    <form id="orderForm" onsubmit="sendToWhatsApp(event)" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-300 mb-2">Your Name</label>
+                                <input type="text" id="custName" required class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-gold transition">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-300 mb-2">Business Name (Optional)</label>
+                                <input type="text" id="bizName" class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-gold transition">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">Select Product of Interest</label>
+                            <select id="productType" class="w-full bg-[#1a1a1a] border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-gold transition appearance-none">
+                                <option value="Peeled Garlic">Peeled Garlic</option>
+                                <option value="Garlic Paste">Garlic Paste</option>
+                                <option value="Ginger Garlic Paste">Ginger Garlic Paste</option>
+                                <option value="Garlic Powder">Garlic Powder</option>
+                                <option value="Fried Garlic">Fried Garlic</option>
+                                <option value="Garlic Oil">Garlic Oil</option>
+                                <option value="Multiple/Bulk Mix">Multiple / Bulk Mix</option>
+                            </select>
+                        </div>
 
-        async function toggleScreamGuard() {
-            if(isGuardActive) return;
-            document.getElementById("stealthOverlay").style.display = "block";
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const analyser = audioCtx.createAnalyser();
-                const source = audioCtx.createMediaStreamSource(stream);
-                const processor = audioCtx.createScriptProcessor(2048, 1, 1);
-                source.connect(analyser); analyser.connect(processor); processor.connect(audioCtx.destination);
-                processor.onaudioprocess = () => {
-                    const data = new Uint8Array(analyser.frequencyBinCount);
-                    analyser.getByteFrequencyData(data);
-                    let val = 0; for(let i=0; i<data.length; i++) val += data[i];
-                    if((val/data.length) > 30 && !emergencyActive) startEmergency("SCREAM DETECTED");
-                };
-                window.addEventListener('devicemotion', e => {
-                    let a = e.accelerationIncludingGravity;
-                    if(Math.abs(a.x)+Math.abs(a.y)+Math.abs(a.z) > 40 && !emergencyActive) startEmergency("SHAKE DETECTED");
-                });
-                isGuardActive = true;
-                document.getElementById("guardBtn").className = "btn btn-guard guard-active";
-                document.getElementById("guardBtn").innerText = "GUARD ACTIVE (LISTENING...)";
-                alert("Guard Mode ON. Scream or Shake to SOS.");
-            } catch(e) { alert("Mic Error: " + e); document.getElementById("stealthOverlay").style.display = "none"; }
-        }
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">Quantity Required & Message</label>
+                            <textarea id="orderMessage" rows="4" required class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-gold transition" placeholder="E.g., I need 5kg of peeled garlic daily..."></textarea>
+                        </div>
 
-        // --- UTILS ---
-        function getDist(l1, n1, l2, n2) {
-            const R = 6371; const dLat = (l2-l1)*Math.PI/180; const dLon = (n2-n1)*Math.PI/180;
-            const a = Math.sin(dLat/2)**2 + Math.cos(l1*Math.PI/180)*Math.cos(l2*Math.PI/180)*Math.sin(dLon/2)**2;
-            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        }
-        function toggleAngelMode() { localStorage.setItem("raksha_is_angel", document.getElementById("angelToggle").checked); location.reload(); }
-        function saveSettings() { localStorage.setItem("raksha_chat_id", document.getElementById("userChatId").value); localStorage.setItem("raksha_phone", document.getElementById("userPhone").value); localStorage.setItem("raksha_user_name", document.getElementById("userNameInput").value); alert("Saved!"); location.reload(); }
-        function closeAngelAlert() { document.getElementById("angelAlertBox").style.display = "none"; ringtone.pause(); clearInterval(vibInterval); if(navigator.vibrate) navigator.vibrate(0); }
-        function openMapToVictim() { window.open(`https://www.google.com/maps?q=${victimLat},${victimLon}`); }
-        function toggleSettings() { const p = document.getElementById("settingsPanel"); p.style.display = (p.style.display === "block" ? "none" : "block"); }
-        function handleStealthTap() { tapCount++; if(tapCount>=6) location.reload(); }
-        function makeCall() { window.location.href = "tel:" + localStorage.getItem("raksha_phone"); }
-        function manualLocation() { window.open(`https://wa.me/?text=Live Loc: https://www.google.com/maps?q=${myLat},${myLon}`); }
-        function triggerUpload() { document.getElementById('fileInput').click(); }
-        function handleImageUpload(e) { const file = e.target.files[0]; if(file) { const reader = new FileReader(); reader.onload = (ev) => { localStorage.setItem("raksha_pic", ev.target.result); document.getElementById("displayProfilePic").style.backgroundImage = `url(${ev.target.result})`; }; reader.readAsDataURL(file); } }
-        
-        // Vault
-        function openSecretMode() { document.getElementById("secretModal").style.display = "block"; }
-        function closeSecretMode() { document.getElementById("secretModal").style.display = "none"; document.getElementById("fakeLogin").style.display = "block"; document.getElementById("realHelp").style.display = "none"; document.getElementById("secretPass").value = ""; }
-        function checkSecretPass() { if(document.getElementById("secretPass").value === "1234") { document.getElementById("fakeLogin").style.display = "none"; document.getElementById("realHelp").style.display = "block"; } }
+                        <button type="submit" class="w-full bg-gold text-premiumBlack py-4 rounded-lg font-bold text-lg hover:bg-white transition flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(212,175,55,0.4)]">
+                            <i class="fa-brands fa-whatsapp text-xl"></i> Send Order via WhatsApp
+                        </button>
+                    </form>
+                </div>
 
-        // --- NEW: VOLUME BUTTON SOS & WAKE LOCK ---
-        let volKeyPressCount = 0;
-        let volKeyTimer;
+            </div>
+        </div>
+    </section>
 
-        // Function to keep screen on (Wake Lock)
-        async function keepAppAlive() {
-            try {
-                if ('wakeLock' in navigator) {
-                    const wakeLock = await navigator.wakeLock.request('screen');
-                    console.log("Wake Lock Active: Screen will stay on.");
-                }
-            } catch (err) { console.log("WakeLock Error: " + err); }
-        }
-
-        window.addEventListener('keydown', function(event) {
-            // Handle Volume Up/Down (Keycodes 24, 25 are common in WebViews)
-            if (event.keyCode === 24 || event.keyCode === 25 || event.key.includes("Volume")) {
-                volKeyPressCount++;
-                clearTimeout(volKeyTimer);
-                
-                // Trigger after 3 fast presses
-                if (volKeyPressCount >= 3) {
-                    if (!emergencyActive) {
-                        if(navigator.vibrate) navigator.vibrate([200, 100, 200]); // Confirmation Vibration
-                        startEmergency("Hardware Volume Key SOS");
-                    }
-                    volKeyPressCount = 0;
-                }
-
-                volKeyTimer = setTimeout(() => { volKeyPressCount = 0; }, 2000);
-            }
-        });
-
-        window.onload = () => {
-            const pic = localStorage.getItem("raksha_pic"), name = localStorage.getItem("raksha_user_name");
-            if(pic) document.getElementById("displayProfilePic").style.backgroundImage = `url(${pic})`;
-            if(name) document.getElementById("displayHeaderName").innerText = name;
-            if(localStorage.getItem("raksha_is_angel") === "true") { document.getElementById("angelToggle").checked = true; document.getElementById("angelStatus").innerText = "ANGEL: ACTIVE"; startAngelListener(); }
-            document.getElementById("userChatId").value = localStorage.getItem("raksha_chat_id") || "";
-            document.getElementById("userPhone").value = localStorage.getItem("raksha_phone") || "";
-            document.getElementById("userNameInput").value = name || "";
+    <!-- 10. Footer -->
+    <footer class="bg-premiumBlack border-t border-white/10 pt-16 pb-8">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-12">
+                <div class="mb-6 md:mb-0 text-center md:text-left">
+                    <div class="text-3xl font-serif font-bold text-gold flex items-center justify-center md:justify-start gap-2 mb-2">
+                        <!-- LOGO PLACEHOLDER -->
+                        <i class="fa-solid fa-seedling text-white"></i> Vardhan Garlic's™️
+                    </div>
+                    <p class="text-gray-400 text-sm">Freshness You Can See, Quality You Can Trust.</p>
+                </div>
+                <div class="flex gap-4">
+                    <a href="https://instagram.com/vardhan.garlics" target="_blank" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-gold hover:text-premiumBlack transition">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="https://wa.me/917061051661" target="_blank" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-gold hover:text-premiumBlack transition">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </a>
+                </div>
+            </div>
             
-            // Activate Wake Lock on Load
-            keepAppAlive();
-        };
+            <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
+                <p>&copy; 2026 Vardhan Garlic's™️. All Rights Reserved.</p>
+                <p class="mt-4 md:mt-0 font-serif text-gold">Made with care by Vardhan Garlic's</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript for WhatsApp Integration -->
+    <script>
+        function sendToWhatsApp(event) {
+            event.preventDefault(); // Prevent standard form submission
+            
+            // Get form values
+            const name = document.getElementById('custName').value;
+            const biz = document.getElementById('bizName').value;
+            const product = document.getElementById('productType').value;
+            const msg = document.getElementById('orderMessage').value;
+            
+            // Format the WhatsApp message
+            let whatsappText = `*New Order / Inquiry from Website*%0A%0A`;
+            whatsappText += `*Name:* ${name}%0A`;
+            if(biz) whatsappText += `*Business:* ${biz}%0A`;
+            whatsappText += `*Product:* ${product}%0A`;
+            whatsappText += `*Message/Quantity:* ${msg}%0A`;
+            
+            // The specific phone number provided
+            const phone = "917061051661";
+            
+            // Create WhatsApp URL and redirect
+            const url = `https://wa.me/${phone}?text=${whatsappText}`;
+            window.open(url, '_blank');
+        }
     </script>
 </body>
 </html>
